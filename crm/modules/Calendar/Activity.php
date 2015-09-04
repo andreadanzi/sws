@@ -944,6 +944,12 @@ function insertIntoRecurringTable(& $recurObj)
 			"Leads" => array("vtiger_seactivityrel"=>array("activityid","crmid"),"vtiger_activity"=>"activityid"),
 			"Accounts" => array("vtiger_seactivityrel"=>array("activityid","crmid"),"vtiger_activity"=>"activityid"),
 			"Potentials" => array("vtiger_seactivityrel"=>array("activityid","crmid"),"vtiger_activity"=>"activityid"),
+			// danzi.tn@20150427 collegamento a Rumors
+			"Rumors" => array("vtiger_seactivityrel"=>array("activityid","crmid"),"vtiger_activity"=>"activityid"),
+			// danzi.tn@20150427e
+			// danzi.tn@20150902 collegamento a Countries
+			"Countries" => array("vtiger_seactivityrel"=>array("activityid","crmid"),"vtiger_activity"=>"activityid"),
+			// danzi.tn@20150902e
 		);
 		return $rel_tables[$secmodule];
 	}

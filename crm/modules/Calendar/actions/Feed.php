@@ -39,6 +39,10 @@ class Calendar_Feed_Action extends Vtiger_BasicAjax_Action {
 				case 'MultipleEvents' : $this->pullMultipleEvents($start,$end, $result,$request->get('mapping'));break;
 				case 'Project': $this->pullProjects($start, $end, $result, $color, $textColor); break;
 				case 'ProjectTask': $this->pullProjectTasks($start, $end, $result, $color, $textColor); break;
+				// danzi.tn@20150427 gestione dei rumors nei feed del calendario
+				case 'Rumors': $this->pullRumors($start, $end, $result, $color, $textColor); break;
+				// danzi.tn@20150427e
+				
 			}
 			echo json_encode($result);
 		} catch (Exception $ex) {
@@ -386,5 +390,43 @@ class Calendar_Feed_Action extends Vtiger_BasicAjax_Action {
 			$result[] = $item;
 		}
 	}
+	
+	// danzi.tn@20150427 gestione dei rumors nei feed del calendario
+	/**
+	 * Function to pull all the current user Rumors
+	 * @param type $startdate
+	 * @param type $enddate
+	 * @param type $result
+	 * @param type $color
+	 * @param type $textColor
+	 */
+	protected function pullRumors($start, $end, &$result, $color = null,$textColor = 'white') {
+		$db = PearDatabase::getInstance();
+		$user = Users_Record_Model::getCurrentUserModel();
+        $userAndGroupIds = array_merge(array($user->getId()),$this->getGroupsIdsForUsers($user->getId()));
+        $params = $userAndGroupIds;
+		
+		$query = "SELECT name, rumor_type,rumor_relevance, due_date, crmid FROM vtiger_rumors";
+		$query.= " INNER JOIN vtiger_crmentity ON vtiger_rumors.rumorsid = vtiger_crmentity.crmid";
+		$query.= " WHERE vtiger_crmentity.deleted=0 AND smownerid IN (". generateQuestionMarks($params) .") AND ";
+		$query.= " due_date >= '$start' AND due_date <= '$end'";
+		$queryResult = $db->pquery($query, $params);
+
+		while($record = $db->fetchByAssoc($queryResult)){
+			$item = array();
+			$crmid = $record['crmid'];
+			$item['id'] = $crmid;
+			$item['title'] = decode_html($record['name']);
+			$item['start'] = $record['due_date'];
+			$item['url']   = sprintf('index.php?module=Rumors&view=Detail&record=%s', $crmid);
+			$item['color'] = $color;
+			$item['textColor'] = $textColor;
+			$result[] = $item;
+		}
+	}
+
+
+
+
 
 }
